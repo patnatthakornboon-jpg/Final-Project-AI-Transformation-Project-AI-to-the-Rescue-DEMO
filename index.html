@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Event &amp; Venue Space Planner</title>
+  <meta name="description" content="บอกโจทย์ของงาน แล้วได้ผังพื้นที่ รายการอุปกรณ์ และงบประมาณโดยประมาณ — IT232 AI Transformation Project">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <h1>AI Event &amp; Venue Space Planner</h1>
+      <p class="lead">บอกโจทย์ของงาน แล้วได้ผังพื้นที่ รายการอุปกรณ์ และงบประมาณโดยประมาณทันที</p>
+    </div>
+    <p class="meta">IT232 Artificial Intelligence for Information Technology<br>AI Transformation Project: AI to the Rescue</p>
+  </header>
+
+  <noscript><p class="error">หน้านี้ต้องเปิดใช้ JavaScript เพื่อคำนวณแผน</p></noscript>
+
+  <main class="layout">
+    <section class="controls" aria-labelledby="h-input">
+      <h2 id="h-input">โจทย์ของงาน</h2>
+
+      <label for="intake">เล่าให้ฟังด้วยภาษาของคุณ</label>
+      <textarea id="intake" rows="3" placeholder="เช่น งานสัมมนา 100 คน มีเวทีและซุ้มอาหาร งบ 5 หมื่นบาท"></textarea>
+      <div class="examples" id="examples" aria-label="ตัวอย่างโจทย์"></div>
+      <div class="row">
+        <button type="button" id="btn-read" class="primary">อ่านโจทย์แล้วกรอกฟอร์ม</button>
+        <span id="intake-status" class="status" role="status" aria-live="polite"></span>
+      </div>
+      <ul id="intake-notices" class="notices"></ul>
+
+      <details class="ai-box">
+        <summary>ใช้ AI (Gemini) อ่านโจทย์และเขียนคำแนะนำ — ไม่บังคับ</summary>
+        <p class="hint">ไม่ใส่ key ก็ใช้งานได้ครบด้วยกฎที่เตรียมไว้ Key จะถูกใช้ส่งตรงจากเบราว์เซอร์ของคุณไปยัง Google เท่านั้น ไม่ถูกบันทึกและไม่ผ่านเซิร์ฟเวอร์ใด ๆ ของโปรเจกต์นี้ (ปิดหน้าแล้วหายไป)</p>
+        <label for="ai-key">Gemini API key</label>
+        <input id="ai-key" type="password" autocomplete="off" spellcheck="false">
+        <label for="ai-model">ชื่อโมเดล (เว้นว่างเพื่อให้ระบบเลือกเอง)</label>
+        <input id="ai-model" type="text" placeholder="อัตโนมัติ (เริ่มที่ gemini-3.8-flash)" spellcheck="false">
+        <div class="row"><button type="button" id="btn-test">ทดสอบการเชื่อมต่อ AI</button></div>
+        <pre id="ai-test" class="ai-test" role="status" aria-live="polite" hidden></pre>
+      </details>
+
+      <h2 id="h-form">รายละเอียดงาน</h2>
+      <form id="form" class="fields" onsubmit="return false">
+        <div class="field"><label for="ev">ประเภทงาน</label><select id="ev"></select></div>
+        <div class="field"><label for="people">จำนวนผู้เข้าร่วม (คน)</label><input id="people" type="number" step="10" inputmode="numeric"></div>
+        <fieldset class="field tiers"><legend>ระดับงบ</legend><div id="tier"></div></fieldset>
+        <div class="field"><label for="layout">รูปแบบการจัดที่นั่ง</label><select id="layout"></select></div>
+        <fieldset class="field"><legend>ส่วนประกอบของงาน</legend><div id="comps" class="checks"></div></fieldset>
+        <div class="field"><label for="budget">งบประมาณ (บาท) — เว้นว่างถ้ายังไม่กำหนด</label><input id="budget" type="number" min="0" step="5000" inputmode="numeric"></div>
+      </form>
+    </section>
+
+    <section class="results" aria-labelledby="h-plan" aria-live="polite">
+      <h2 id="h-plan" class="sr-only">ผลการวางแผน</h2>
+      <p id="empty" class="empty">พิมพ์โจทย์ของงานทางซ้าย แล้วกด "อ่านโจทย์แล้วกรอกฟอร์ม" หรือกดตัวอย่าง ผังพื้นที่ รายการอุปกรณ์ และงบจะแสดงที่นี่</p>
+      <p id="error" class="error" role="alert" hidden></p>
+      <div id="out" hidden>
+        <div class="drawing">
+          <div id="plan-svg"></div>
+          <p class="caption">ผัง schematic ขนาดสัดส่วนตามพื้นที่ที่คำนวณ ไม่ใช่แบบก่อสร้าง ใช้ประกอบการเลือกสถานที่</p>
+        </div>
+
+        <dl id="kpis" class="spec"></dl>
+        <p id="budget-note" class="budget-note" hidden></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="out2" hidden>
+    <section class="band two">
+      <div>
+        <h2>เทียบระดับงบ</h2>
+        <table id="tiers-table"></table>
+        <p class="caption">ระดับสูงขึ้น = พื้นที่ต่อคนโปร่งขึ้น และมีอุปกรณ์เพิ่ม เช่น ไฟเวที ถ่ายทอดสด ดอกไม้</p>
+        <h2>โซนและความปลอดภัย</h2>
+        <table id="zones-table"></table>
+        <p id="safety" class="safety"></p>
+      </div>
+      <div>
+        <h2>คำแนะนำ</h2>
+        <ul id="advice" class="advice"></ul>
+        <p id="advice-src" class="caption"></p>
+        <button type="button" id="btn-advice" class="primary" hidden>ให้ AI เขียนคำแนะนำสำหรับแผนนี้</button>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="band-head">
+        <h2>รายการอุปกรณ์ที่ต้องจัดเตรียม</h2>
+        <div class="actions">
+          <button type="button" id="btn-csv">ดาวน์โหลด CSV</button>
+          <button type="button" id="btn-print">พิมพ์ Checklist</button>
+        </div>
+      </div>
+      <div id="checklist"></div>
+    </section>
+  </div>
+
+  <section class="band flow">
+    <h2>ระบบทำงานอย่างไร</h2>
+    <ol>
+      <li><strong>อ่านโจทย์</strong> AI (หรือกฎ rule-based) แปลงข้อความเป็นประเภทงาน จำนวนคน ส่วนประกอบ และงบ</li>
+      <li><strong>คำนวณ</strong> rule engine ใช้ข้อมูลในไฟล์ .json คำนวณพื้นที่ จำนวนอุปกรณ์ และราคา ไม่ให้ AI เดาตัวเลข</li>
+      <li><strong>แสดงผล</strong> ได้ผังพื้นที่ ตารางเทียบระดับงบ และ Checklist ที่ดาวน์โหลดได้</li>
+      <li><strong>อธิบาย</strong> AI เขียนคำแนะนำจากตัวเลขที่คำนวณแล้วเท่านั้น</li>
+    </ol>
+  </section>
+
+  <footer class="foot">
+    <p>ราคาอุปกรณ์เป็นค่าประมาณเพื่อการวางแผน และพื้นที่ต่อคนเป็นค่ามาตรฐานทั่วไป ควรตรวจกับผู้ให้บริการและข้อกำหนดของสถานที่จริงก่อนตัดสินใจ</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="planner.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>

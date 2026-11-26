@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "description": "รูปแบบการจัดที่นั่ง (layout) พร้อมพื้นที่ต่อคน หน่วย ตร.ม.",
+    "source_note": "ค่ามาตรฐานทั่วไปในอุตสาหกรรม MICE ใช้เป็นค่าประมาณเพื่อการวางแผนเบื้องต้น"
+  },
+  "layouts": [
+    {
+      "id": "theater",
+      "name_th": "เธียเตอร์ (แถวเก้าอี้หันหน้าเวที)",
+      "name_en": "Theater",
+      "sqm_per_person": { "tight": 0.8, "standard": 1.0, "comfort": 1.2 },
+      "seats_per_unit": 1,
+      "unit_name": "เก้าอี้",
+      "has_tables": false,
+      "best_for": ["seminar", "conference", "product_launch"]
+    },
+    {
+      "id": "classroom",
+      "name_th": "ห้องเรียน (โต๊ะยาวหันหน้าเวที)",
+      "name_en": "Classroom",
+      "sqm_per_person": { "tight": 1.5, "standard": 1.8, "comfort": 2.2 },
+      "seats_per_unit": 2,
+      "unit_name": "โต๊ะยาว 1.8 ม.",
+      "has_tables": true,
+      "best_for": ["workshop", "seminar"]
+    },
+    {
+      "id": "banquet",
+      "name_th": "โต๊ะจีน/โต๊ะกลม (10 ที่นั่งต่อโต๊ะ)",
+      "name_en": "Banquet Round",
+      "sqm_per_person": { "tight": 1.4, "standard": 1.7, "comfort": 2.0 },
+      "seats_per_unit": 10,
+      "unit_name": "โต๊ะกลม",
+      "has_tables": true,
+      "best_for": ["wedding_banquet"]
+    },
+    {
+      "id": "cabaret",
+      "name_th": "คาบาเรต์ (โต๊ะกลมนั่งครึ่งวง หันหน้าเวที)",
+      "name_en": "Cabaret",
+      "sqm_per_person": { "tight": 1.5, "standard": 1.8, "comfort": 2.2 },
+      "seats_per_unit": 6,
+      "unit_name": "โต๊ะกลม",
+      "has_tables": true,
+      "best_for": ["workshop", "seminar", "wedding_banquet"]
+    },
+    {
+      "id": "cocktail",
+      "name_th": "ค็อกเทล (ยืนเดินสังสรรค์)",
+      "name_en": "Cocktail / Standing",
+      "sqm_per_person": { "tight": 0.7, "standard": 0.9, "comfort": 1.2 },
+      "seats_per_unit": 8,
+      "unit_name": "โต๊ะค็อกเทล",
+      "has_tables": true,
+      "best_for": ["networking", "exhibition", "product_launch"]
+    },
+    {
+      "id": "u_shape",
+      "name_th": "ตัวยู (U-Shape)",
+      "name_en": "U-Shape",
+      "sqm_per_person": { "tight": 2.2, "standard": 2.6, "comfort": 3.2 },
+      "seats_per_unit": 2,
+      "unit_name": "โต๊ะยาว 1.8 ม.",
+      "has_tables": true,
+      "best_for": ["workshop"]
+    }
+  ]
+}
